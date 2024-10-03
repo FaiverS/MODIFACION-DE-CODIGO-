@@ -31,44 +31,28 @@ char data[2];
 
 const char *mensaje_inicio = "Arranque del programa\n\r";
 
+void Pantalla_de_inicio (void);
+void Muestreo_de_potenciomentro (int dec);
+
+
+Thread T_Pantalla(osPriorityNormal, 4096, NULL, NULL);
+
 int main()
 { 
-   // arranque del programa      
-    oled.begin();
-    oled.setTextSize(1);
-    oled.setTextColor(1);
-    oled.display();
-    ThisThread::sleep_for(3000ms);
-    // Limpiar Pantalla
-    oled.clearDisplay();
-    oled.display();
-    oled.printf( "Test\r\n" );
-    oled.display();
-    //arranque del sensor de temperatura
-     i2c.write(TMP102_ADDRESS, comando, 3);
-    // saludo por el puerto serial
-    serial.write(mensaje_inicio, strlen(mensaje_inicio));
+  
+    T_Pantalla.start(Pantalla_de_inicio);
+    wait_us(1e5);
 
     while (true) {
         // Lectura del sensor analogo (Potenciometro)
         Vin = ain*3.3;
         ent = int(Vin); 
         dec = int((Vin-ent)*10000); 
-        // Visualizacion
-        oled.clearDisplay();
-        oled.display();
-        // formateo de la cadena de caracteres
-        sprintf(men, "El voltaje es:\n\r %01u.%04u volts \n\r", ent, dec);
-        oled.setTextCursor(0,2);
-        oled.printf(men);
-        oled.display();
-        // impresion puerto serie
-        serial.write(men, strlen(men));
-        //Lectura sensor I2C
-        // Leer el registro de temperatura
-        comando[0] = 0; // Registro de temperatura
-        i2c.write(TMP102_ADDRESS, comando, 1); // Enviar el comando para leer
-        i2c.read(TMP102_ADDRESS, data, 2); // Leer 2 bytes
+     
+
+
+
+
         int16_t temp = (data[0] << 4) | (data[1] >> 4);
         float Temperatura = temp *0.0625; 
         ent = int(Temperatura); 
@@ -86,4 +70,46 @@ int main()
 
         ThisThread::sleep_for(tiempo_muestreo);
     }
+
 }
+
+void Pantalla_de_inicio (void)
+{
+      // arranque del programa      
+    oled.begin();
+    oled.setTextSize(1);
+    oled.setTextColor(1);
+    oled.display();
+    ThisThread::sleep_for(3000ms);
+    // Limpiar Pantalla
+    oled.clearDisplay();
+    oled.display();
+    oled.printf( "Test\r\n" );
+    oled.display();
+    //arranque del sensor de temperatura
+     i2c.write(TMP102_ADDRESS, comando, 3);
+    // saludo por el puerto serial
+    serial.write(mensaje_inicio, strlen(mensaje_inicio));
+}
+
+
+void Muestreo_de_potenciomentro (int dec)
+{   // Visualizacion
+        oled.clearDisplay();
+        oled.display();
+        // formateo de la cadena de caracteres
+        sprintf(men, "El voltaje es:\n\r %01u.%04u volts \n\r", ent, dec);
+        oled.setTextCursor(0,2);
+        oled.printf(men);
+        oled.display();
+        // impresion puerto serie
+        serial.write(men, strlen(men));
+        //Lectura sensor I2C
+        // Leer el registro de temperatura
+        comando[0] = 0; // Registro de temperatura
+        i2c.write(TMP102_ADDRESS, comando, 1); // Enviar el comando para leer
+        i2c.read(TMP102_ADDRESS, data, 2); // Leer 2 bytes}
+}
+
+
+
