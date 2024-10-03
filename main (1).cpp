@@ -55,8 +55,8 @@ int main()
 
         int16_t temp = (data[0] << 4) | (data[1] >> 4);
         float Temperatura = temp *0.0625; 
-        ent = int(Temperatura); 
-        
+        ente = int(Temperatura); 
+        deci = int((Temperatura-ent)*10000);
     }
 
 }
@@ -99,14 +99,14 @@ void Muestreo_de_potenciomentro (int dec)
         i2c.read(TMP102_ADDRESS, data, 2); // Leer 2 bytes}
 }
 
-void Temperatura (int dec)
+void Temperatura (int deci)
 { 
-  dec = int((Temperatura-ent)*10000); 
+   
 
         ThisThread::sleep_for(2000ms);
         oled.clearDisplay();
         oled.display();
-        sprintf(men, "La Temperatura es:\n\r %01u.%04u Celsius\n\r", ent, dec);
+        sprintf(men, "La Temperatura es:\n\r %01u.%04u Celsius\n\r", ente, deci);
         oled.setTextCursor(0,2);
         oled.printf(men);
         oled.display();
